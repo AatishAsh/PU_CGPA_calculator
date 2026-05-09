@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+student_results.xlsx
+full_subject_results.xlsx
