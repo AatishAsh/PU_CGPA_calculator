@@ -1,0 +1,111 @@
+<!-- ==========================================
+templates/admin.html
+========================================== -->
+
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Admin Dashboard</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+
+body{
+    background:#0f172a;
+    color:white;
+}
+
+.card-dark{
+    background:#1e293b;
+    padding:25px;
+    border-radius:15px;
+}
+
+a{
+    text-decoration:none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container mt-4">
+
+<h2 class="text-center mb-4">
+Admin Dashboard
+</h2>
+
+<div class="text-end mb-3">
+
+<a
+    href="/admin/export"
+    class="btn btn-success"
+>
+Download Excel Sheet
+</a>
+<a
+    href="/admin/export_full"
+    class="btn btn-warning"
+>
+Download Full Subject Excel
+</a>
+
+</div>
+
+<div class="card-dark">
+
+<table class="table table-dark table-bordered">
+
+<tr>
+<th>Name</th>
+<th>Register Number</th>
+<th>CGPA</th>
+</tr>
+
+{% for username, data in users.items() %}
+
+<tr>
+
+<td>
+
+<a
+    href="/admin/user/{{username}}"
+    class="text-info"
+>
+{{username}}
+</a>
+
+</td>
+
+<td>
+{{data.register_number}}
+</td>
+
+<td>
+{{data.cgpa or "-"}}
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+<div class="text-center mt-4">
+
+<a href="/logout" class="btn btn-danger">
+Logout
+</a>
+
+</div>
+
+</div>
+
+</body>
+</html>

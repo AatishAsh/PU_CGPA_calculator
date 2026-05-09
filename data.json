@@ -1,0 +1,246 @@
+{
+    "users": {
+        "harish": {
+            "register_number": "23TD0025",
+            "password": "123",
+            "gradesData": {
+                "1": {
+                    "subjects": [
+                        {
+                            "subject": "Mathematics-I",
+                            "grade": "A",
+                            "credit": 4
+                        },
+                        {
+                            "subject": "Physics",
+                            "grade": "B+",
+                            "credit": 3
+                        },
+                        {
+                            "subject": "Basic Electronics Engineering",
+                            "grade": "A",
+                            "credit": 3
+                        },
+                        {
+                            "subject": "Physics Lab",
+                            "grade": "A+",
+                            "credit": 2
+                        },
+                        {
+                            "subject": "Basic Electronics Lab",
+                            "grade": "A+",
+                            "credit": 2
+                        },
+                        {
+                            "subject": "Engineering Graphics & Design Lab",
+                            "grade": "A",
+                            "credit": 3
+                        },
+                        {
+                            "subject": "Design Thinking",
+                            "grade": "A+",
+                            "credit": 1
+                        }
+                    ],
+                    "sgpa": 9.11,
+                    "credits": 18,
+                    "points": 164
+                },
+                "2": {
+                    "subjects": [
+                        {
+                            "subject": "English",
+                            "grade": "B+",
+                            "credit": 3
+                        },
+                        {
+                            "subject": "Mathematics-II",
+                            "grade": "B+",
+                            "credit": 4
+                        },
+                        {
+                            "subject": "Chemistry",
+                            "grade": "B",
+                            "credit": 3
+                        },
+                        {
+                            "subject": "Programming for Problem Solving",
+                            "grade": "A",
+                            "credit": 3
+                        },
+                        {
+                            "subject": "Universal Human Values-II",
+                            "grade": "A",
+                            "credit": 3
+                        },
+                        {
+                            "subject": "Chemistry Lab",
+                            "grade": "A",
+                            "credit": 2
+                        },
+                        {
+                            "subject": "Programming Lab",
+                            "grade": "A+",
+                            "credit": 2
+                        },
+                        {
+                            "subject": "Workshop / Manufacturing Lab",
+                            "grade": "A",
+                            "credit": 3
+                        }
+                    ],
+                    "sgpa": 8.52,
+                    "credits": 23,
+                    "points": 196
+                },
+                "3": {
+                    "subjects": [
+                        {
+                            "subject": "Microprocessor and Microcontroller",
+                            "grade": "B+",
+                            "credit": 3
+                        },
+                        {
+                            "subject": "Data Structures and Algorithms",
+                            "grade": "A",
+                            "credit": 3
+                        },
+                        {
+                            "subject": "Digital Electronics and Systems",
+                            "grade": "B+",
+                            "credit": 3
+                        },
+                        {
+                            "subject": "Mathematics-III",
+                            "grade": "A",
+                            "credit": 3
+                        },
+                        {
+                            "subject": "Principles of Management",
+                            "grade": "A",
+                            "credit": 3
+                        },
+                        {
+                            "subject": "MPMC Lab",
+                            "grade": "A+",
+                            "credit": 2
+                        },
+                        {
+                            "subject": "DSA Lab",
+                            "grade": "A+",
+                            "credit": 2
+                        },
+                        {
+                            "subject": "Digital Electronics Lab",
+                            "grade": "A",
+                            "credit": 2
+                        },
+                        {
+                            "subject": "IT Workshop",
+                            "grade": "A+",
+                            "credit": 3
+                        }
+                    ],
+                    "sgpa": 9.04,
+                    "credits": 24,
+                    "points": 217
+                },
+                "4": {
+                    "subjects": [
+                        {
+                            "subject": "Discrete Mathematics",
+                            "grade": "A",
+                            "credit": 4
+                        },
+                        {
+                            "subject": "Computer Organization & Architecture",
+                            "grade": "A",
+                            "credit": 3
+                        },
+                        {
+                            "subject": "Design & Analysis of Algorithms",
+                            "grade": "A+",
+                            "credit": 3
+                        },
+                        {
+                            "subject": "Advanced Programming in Java",
+                            "grade": "B+",
+                            "credit": 3
+                        },
+                        {
+                            "subject": "Organizational Behaviour",
+                            "grade": "B+",
+                            "credit": 3
+                        },
+                        {
+                            "subject": "COA Lab",
+                            "grade": "A+",
+                            "credit": 2
+                        },
+                        {
+                            "subject": "DAA Lab",
+                            "grade": "A+",
+                            "credit": 2
+                        },
+                        {
+                            "subject": "Java Programming Lab",
+                            "grade": "A+",
+                            "credit": 2
+                        }
+                    ],
+                    "sgpa": 9.14,
+                    "credits": 22,
+                    "points": 201
+                },
+                "5": {
+                    "subjects": [
+                        {
+                            "subject": "Computer Networks",
+                            "grade": "A",
+                            "credit": 3
+                        },
+                        {
+                            "subject": "Database Systems",
+                            "grade": "B+",
+                            "credit": 3
+                        },
+                        {
+                            "subject": "Theory of Computation",
+                            "grade": "B+",
+                            "credit": 4
+                        },
+                        {
+                            "subject": "Operating System",
+                            "grade": "A",
+                            "credit": 3
+                        },
+                        {
+                            "subject": "Professional Elective-I",
+                            "grade": "A",
+                            "credit": 3
+                        },
+                        {
+                            "subject": "CN Lab",
+                            "grade": "A+",
+                            "credit": 2
+                        },
+                        {
+                            "subject": "DBMS Lab",
+                            "grade": "A+",
+                            "credit": 2
+                        },
+                        {
+                            "subject": "OS Lab",
+                            "grade": "A+",
+                            "credit": 2
+                        }
+                    ],
+                    "sgpa": 8.95,
+                    "credits": 22,
+                    "points": 197
+                }
+            },
+            "cgpa": 8.94
+        }
+    }
+}

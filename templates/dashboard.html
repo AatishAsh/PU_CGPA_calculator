@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Dashboard</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+
+body{
+    background:#111827;
+    color:white;
+}
+
+.card-dark{
+    background:#1f2937;
+    border-radius:15px;
+    padding:25px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container mt-4">
+
+<h2 class="text-center">
+{{username}}
+</h2>
+
+<p class="text-center text-secondary">
+{{register_number}}
+</p>
+
+<!-- SELECT SEM -->
+<div class="card-dark">
+
+<form method="GET">
+
+<select
+    name="semester"
+    class="form-select"
+    onchange="this.form.submit()"
+>
+
+<option value="">
+-- Select Semester --
+</option>
+
+{% for sem in syllabus %}
+
+<option
+    value="{{sem}}"
+    {% if selected_sem == sem %}selected{% endif %}
+>
+Semester {{sem}}
+</option>
+
+{% endfor %}
+
+</select>
+
+</form>
+
+</div>
+
+<!-- SUBJECTS -->
+{% if selected_sem %}
+
+<div class="card-dark mt-4">
+
+<form method="POST">
+
+<input
+    type="hidden"
+    name="semester"
+    value="{{selected_sem}}"
+>
+
+<h4 class="mb-4">
+Semester {{selected_sem}}
+</h4>
+
+{% for sub, credit in syllabus[selected_sem] %}
+
+<div class="row mb-3">
+
+<div class="col-md-6">
+{{sub}}
+</div>
+
+<div class="col-md-3">
+
+<select
+    name="sub{{loop.index0}}"
+    class="form-select"
+    required
+>
+
+<option value="">Grade</option>
+
+<option>A+</option>
+<option>A</option>
+<option>B+</option>
+<option>B</option>
+<option>C+</option>
+<option>C</option>
+<option>D</option>
+<option>F</option>
+<option>FR</option>
+
+</select>
+
+</div>
+
+<div class="col-md-3">
+Credit : {{credit}}
+</div>
+
+</div>
+
+{% endfor %}
+
+<button class="btn btn-primary">
+Save Semester Grades
+</button>
+
+</form>
+
+</div>
+
+{% endif %}
+
+<!-- SGPA -->
+{% if sgpa %}
+
+<div class="alert alert-success mt-4">
+Semester SGPA : {{sgpa}}
+</div>
+
+{% endif %}
+
+<!-- CGPA -->
+{% if cgpa %}
+
+<div class="alert alert-info">
+Overall CGPA : {{cgpa}}
+</div>
+
+{% endif %}
+
+<!-- SEMESTER TABLES -->
+{% for sem, data in gradesData.items() %}
+
+<div class="card-dark mt-4">
+
+<h4>
+Semester {{sem}}
+</h4>
+
+<table class="table table-dark table-bordered mt-3">
+
+<tr>
+<th>Subject</th>
+<th>Grade</th>
+<th>Credit</th>
+</tr>
+
+{% for s in data.subjects %}
+
+<tr>
+<td>{{s.subject}}</td>
+<td>{{s.grade}}</td>
+<td>{{s.credit}}</td>
+</tr>
+
+{% endfor %}
+
+<tr>
+<th colspan="2">SGPA</th>
+<th>{{data.sgpa}}</th>
+</tr>
+
+</table>
+
+</div>
+
+{% endfor %}
+
+<div class="text-center mt-4">
+
+<a href="/logout" class="btn btn-danger">
+Logout
+</a>
+
+</div>
+
+</div>
+
+</body>
+</html>
