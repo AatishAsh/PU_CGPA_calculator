@@ -1,4 +1,8 @@
 __pycache__/
 *.pyc
+venv/
+.env
+database.db
 student_results.xlsx
 full_subject_results.xlsx
+it_sub.pdf

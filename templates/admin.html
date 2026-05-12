@@ -63,30 +63,35 @@ Download Full Subject Excel
 <tr>
 <th>Name</th>
 <th>Register Number</th>
+<th>Dept</th>
 <th>CGPA</th>
 </tr>
 
-{% for username, data in users.items() %}
+{% for user in users %}
 
 <tr>
 
 <td>
 
 <a
-    href="/admin/user/{{username}}"
+    href="/admin/user/{{user.username}}"
     class="text-info"
 >
-{{username}}
+{{user.username}}
 </a>
 
 </td>
 
 <td>
-{{data.register_number}}
+{{user.register_number}}
 </td>
 
 <td>
-{{data.cgpa or "-"}}
+{{user.department}}
+</td>
+
+<td>
+{{user.cgpa or "-"}}
 </td>
 
 </tr>
