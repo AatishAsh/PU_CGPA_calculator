@@ -27,23 +27,27 @@ def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # Check if department column exists, if not add it
+    # Check if department or is_admin columns exist, if not add them
     cursor.execute("PRAGMA table_info(users)")
     columns = [column[1] for column in cursor.fetchall()]
     
-    # Users table
+    # Users table updated with is_admin
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             username TEXT PRIMARY KEY,
             password TEXT NOT NULL,
             register_number TEXT,
             department TEXT DEFAULT 'CSE',
-            cgpa REAL
+            cgpa REAL,
+            is_admin BOOLEAN DEFAULT 0
         )
     ''')
     
     if 'department' not in columns:
         cursor.execute("ALTER TABLE users ADD COLUMN department TEXT DEFAULT 'CSE'")
+        
+    if 'is_admin' not in columns:
+        cursor.execute("ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT 0")
     
     # Grades table
     cursor.execute('''
@@ -86,11 +90,11 @@ syllabus = {
         "8": [("Professional Elective-IV", 3), ("Open Elective-II", 3), ("Open Elective-III", 3), ("Capstone Project-II", 6), ("Internship", 1)]
     },
     "IT": {
-        "1": [("Mathematics-I", 4), ("Physics", 3), ("Basic Electronics Engineering", 3), ("Physics Lab", 2), ("Basic Electronics Lab", 2), ("Engineering Graphics and Design Lab", 3), ("Design Thinking", 1), ("IDEA Workshop Lab", 0)],
-        "2": [("English", 3), ("Mathematics-II", 4), ("Chemistry", 3), ("Programming for Problem Solving", 3), ("Universal Human Values II", 3), ("Chemistry Lab", 2), ("Programming for Problem Solving Lab", 2), ("Workshop /Manufacturing Lab", 3), ("Sports and Yoga", 0)],
+        "1": [("Mathematics-I", 4), ("Physics", 3), ("Basic Electronics Engineering", 3), ("Physics Lab", 2), ("Basic Electronics Lab", 2), ("Engineering Graphics and Design Lab", 3), ("Design Thinking", 1)],
+        "2": [("English", 3), ("Mathematics-II", 4), ("Chemistry", 3), ("Programming for Problem Solving", 3), ("Universal Human Values II", 3), ("Chemistry Lab", 2), ("Programming for Problem Solving Lab", 2), ("Workshop /Manufacturing Lab", 3)],
         "3": [("Mathematics-III", 3), ("Digital Electronics and System", 3), ("Data Structures and Algorithms", 3), ("Object Oriented Programming", 3), ("Communication Engineering", 3), ("Computer Organization and Architecture", 3), ("Data Structures and Algorithms Lab", 2), ("Object Oriented Programming Lab", 2), ("Communication Engineering Lab", 2)],
-        "4": [("Discrete Mathematics", 4), ("Theory of Computation", 3), ("Information Coding Techniques", 3), ("Database Management Systems", 3), ("Web Technology", 3), ("Operating Systems", 3), ("Environmental Science", 0), ("Database Management Systems Lab", 2), ("Web Technology Lab", 2), ("Operating Systems Lab", 2)],
-        "5": [("Computer Networks", 3), ("Cloud Computing", 3), ("Distributed Computing", 3), ("Embedded Systems and IoT", 3), ("Principles of Management", 3), ("Constitution of India", 0), ("Computer Networks Lab", 2), ("Cloud Computing Lab", 2), ("Embedded Systems and IoT Lab", 2)],
+        "4": [("Discrete Mathematics", 4), ("Theory of Computation", 3), ("Information Coding Techniques", 3), ("Database Management Systems", 3), ("Web Technology", 3), ("Operating Systems", 3), ("Database Management Systems Lab", 2), ("Web Technology Lab", 2), ("Operating Systems Lab", 2)],
+        "5": [("Computer Networks", 3), ("Cloud Computing", 3), ("Distributed Computing", 3), ("Embedded Systems and IoT", 3), ("Principles of Management", 3), ("Computer Networks Lab", 2), ("Cloud Computing Lab", 2), ("Embedded Systems and IoT Lab", 2)],
         "6": [("Artificial Intelligence", 3), ("Software Engineering", 3), ("Compiler Design", 3), ("Professional Elective-I", 3), ("Professional Elective-II", 3), ("Human Resource Management", 3), ("Artificial Intelligence Lab", 2), ("Mini Project", 3)],
         "7": [("Organizational Behavior", 3), ("Cyber Security", 3), ("Professional Elective-III", 3), ("Professional Elective-IV", 3), ("Seminar", 1), ("Project I", 6)],
         "8": [("Open Elective-I", 3), ("Open Elective-II", 3), ("Open Elective-III", 3), ("Internship", 1), ("Project II", 6)]
@@ -106,13 +110,6 @@ def login():
         action = request.form.get("action")
         regno = request.form.get("regno", "").strip().upper()
         password = request.form.get("password")
-
-        # ADMIN LOGIN (Keep it simple but use env var if possible)
-        admin_pass = os.environ.get("ADMIN_PASSWORD", "admin123")
-        if regno == "ADMIN" and password == admin_pass:
-            session.clear()
-            session["admin"] = True
-            return redirect("/admin")
 
         conn = get_db_connection()
 
@@ -141,10 +138,18 @@ def login():
             user = conn.execute("SELECT * FROM users WHERE register_number = ?", (regno,)).fetchone()
             if user and check_password_hash(user["password"], password):
                 session.clear()
-                session["user"] = user["username"]
-                session["department"] = user["department"]
-                conn.close()
-                return redirect("/dashboard")
+                
+                # Check role
+                if user["is_admin"]:
+                    session["admin"] = True
+                    session["admin_user"] = user["username"]
+                    conn.close()
+                    return redirect("/admin")
+                else:
+                    session["user"] = user["username"]
+                    session["department"] = user["department"]
+                    conn.close()
+                    return redirect("/dashboard")
             
             conn.close()
             flash("Invalid Credentials", "danger")
@@ -253,10 +258,11 @@ def admin():
     if "admin" not in session:
         return redirect("/")
 
+    admin_username = session.get("admin_user", "Admin")
     conn = get_db_connection()
     users = conn.execute("SELECT username, register_number, department, cgpa FROM users").fetchall()
     conn.close()
-    return render_template("admin.html", users=users)
+    return render_template("admin.html", users=users, admin_username=admin_username)
 
 # ==========================================
 # ADMIN USER DETAILS
