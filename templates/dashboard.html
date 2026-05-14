@@ -1,107 +1,117 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { background: #111827; color: white; }
-        .card-dark { background: #1f2937; border-radius: 15px; padding: 25px; }
-        .table-dark { --bs-table-bg: #1f2937; }
-    </style>
-</head>
-<body>
+{% extends "base.html" %}
 
-<div class="container mt-4">
-    <!-- FLASH MESSAGES -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+{% block title %}Dashboard - PU CGPA Portal{% endblock %}
 
-    <h2 class="text-center">{{username}}</h2>
-    <p class="text-center text-secondary mb-0">{{register_number}}</p>
-    <p class="text-center text-primary mb-3">{{department}} Department</p>
-
-    <!-- SELECT SEM -->
-    <div class="card-dark">
-        <form method="GET">
-            <select name="semester" class="form-select" onchange="this.form.submit()">
-                <option value="">-- Select Semester --</option>
-                {% for sem in syllabus %}
-                <option value="{{sem}}" {% if selected_sem == sem %}selected{% endif %}>
-                    Semester {{sem}}
-                </option>
-                {% endfor %}
-            </select>
-        </form>
+{% block sidebar_nav %}
+    {{ super() }}
+    <div class="mb-4">
+        <h5 class="fw-bold mb-1">{{username}}</h5>
+        <p class="small fw-bold text-uppercase opacity-75 mb-0">{{register_number}}</p>
+        <p class="small fw-bold text-uppercase text-primary mb-3">{{department}} DEPT</p>
     </div>
-
-    <!-- SUBJECTS ENTRY -->
-    {% if selected_sem %}
-    <div class="card-dark mt-4">
-        <form method="POST">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="semester" value="{{selected_sem}}">
-            <h4 class="mb-4">Semester {{selected_sem}}</h4>
-            
-            {% for sub, credit in syllabus[selected_sem] %}
-            <div class="row mb-3 align-items-center">
-                <div class="col-md-6">{{sub}}</div>
-                <div class="col-md-3">
-                    <select name="sub{{loop.index0}}" class="form-select" required>
-                        <option value="">Grade</option>
-                        {% for g in ["A+", "A", "B+", "B", "C+", "C", "D", "F", "FR"] %}
-                        <option value="{{g}}" {% if current_sem_grades.get(sub) == g %}selected{% endif %}>{{g}}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-3 text-secondary">Credit: {{credit}}</div>
-            </div>
-            {% endfor %}
-            
-            <button class="btn btn-primary w-100 mt-2">Save Semester Grades</button>
-        </form>
+    
+    <div class="d-grid gap-3">
+        <a href="/dashboard" class="neo-btn neo-btn-primary text-center">Home</a>
+        <a href="/logout" class="neo-btn neo-btn-danger text-center">Logout</a>
     </div>
-    {% endif %}
+{% endblock %}
 
+{% block page_header %}
+    <h2 class="neo-heading">Student Dashboard</h2>
+    <p class="fw-bold">Welcome back, {{username.split()[0]}}!</p>
+{% endblock %}
+
+{% block content %}
     <!-- OVERALL SUMMARY -->
     {% if cgpa %}
-    <div class="alert alert-info mt-4 text-center">
-        <strong>Overall CGPA: {{cgpa}}</strong>
+    <div class="neo-card neo-card-utility text-center mb-5">
+        <h3 class="mb-0">Overall CGPA: <span class="text-primary">{{cgpa}}</span></h3>
     </div>
     {% endif %}
 
-    <!-- SAVED SEMESTERS TABLES -->
-    {% for sem, data in gradesData.items() | sort %}
-    <div class="card-dark mt-4">
-        <div class="d-flex justify-content-between">
-            <h4>Semester {{sem}}</h4>
-            <span class="badge bg-success fs-6">SGPA: {{data.sgpa}}</span>
+    <div class="row">
+        <div class="col-lg-5">
+            <!-- SELECT SEM -->
+            <div class="neo-card neo-card-utility">
+                <h4 class="mb-3">Select Semester</h4>
+                <form method="GET">
+                    <select name="semester" class="form-select mb-3" onchange="this.form.submit()">
+                        <option value="">-- CHOOSE --</option>
+                        {% for sem in syllabus %}
+                        <option value="{{sem}}" {% if selected_sem == sem %}selected{% endif %}>
+                            SEMESTER {{sem}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+
+            <!-- SUBJECTS ENTRY -->
+            {% if selected_sem %}
+            <div class="neo-card neo-card-hero">
+                <h4 class="mb-4">Enter Grades: Sem {{selected_sem}}</h4>
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="semester" value="{{selected_sem}}">
+                    
+                    {% for sub, credit in syllabus[selected_sem] %}
+                    <div class="mb-4 p-3 bg-white neo-border">
+                        <div class="fw-bold text-uppercase small mb-2">{{sub}}</div>
+                        <div class="row g-2 align-items-center">
+                            <div class="col-7">
+                                <select name="sub{{loop.index0}}" class="form-select form-select-sm" required>
+                                    <option value="">GRADE</option>
+                                    {% for g in ["A+", "A", "B+", "B", "C+", "C", "D", "F", "FR"] %}
+                                    <option value="{{g}}" {% if current_sem_grades.get(sub) == g %}selected{% endif %}>{{g}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-5 text-end small fw-bold text-uppercase">
+                                CR: {{credit}}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <button type="submit" class="neo-btn neo-btn-primary w-100 mt-2">Update Grades</button>
+                </form>
+            </div>
+            {% endif %}
         </div>
-        <table class="table table-dark table-hover mt-3">
-            <thead>
-                <tr><th>Subject</th><th>Grade</th><th>Credit</th></tr>
-            </thead>
-            <tbody>
-                {% for s in data.subjects %}
-                <tr><td>{{s.subject}}</td><td>{{s.grade}}</td><td>{{s.credit}}</td></tr>
+
+        <div class="col-lg-7">
+            <h4 class="mb-4 neo-heading">Academic History</h4>
+            <!-- SAVED SEMESTERS TABLES -->
+            {% if gradesData %}
+                {% for sem, data in gradesData.items() | sort %}
+                <div class="neo-card neo-card-data mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="mb-0">Semester {{sem}}</h4>
+                        <div class="neo-border bg-white px-3 py-1 fw-bold">SGPA: {{data.sgpa}}</div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered border-dark fw-bold small text-uppercase mb-0">
+                            <thead class="bg-white">
+                                <tr><th>Subject</th><th>Grade</th><th>Cr</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for s in data.subjects %}
+                                <tr>
+                                    <td>{{s.subject}}</td>
+                                    <td class="text-center">{{s.grade}}</td>
+                                    <td class="text-center">{{s.credit}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
                 {% endfor %}
-            </tbody>
-        </table>
+            {% else %}
+                <div class="neo-card neo-card-utility text-center">
+                    <p class="mb-0 fw-bold">No academic records found. Start by entering grades for a semester.</p>
+                </div>
+            {% endif %}
+        </div>
     </div>
-    {% endfor %}
-
-    <div class="text-center mt-5 mb-5">
-        <a href="/logout" class="btn btn-outline-danger">Logout</a>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% endblock %}

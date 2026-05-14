@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PU CGPA Portal{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-cream: #FDFBEA;
+            --nav-sage: #A8D1B1;
+            --hero-yellow: #F4D03F;
+            --data-pink: #F5B7B1;
+            --border-black: #000000;
+        }
+
+        body {
+            background-color: var(--bg-cream);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--border-black);
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, .neo-heading {
+            font-family: monospace;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        /* NEO-BRUTALIST CORE COMPONENTS */
+        .neo-border {
+            border: 3px solid var(--border-black) !important;
+            border-radius: 0 !important;
+        }
+
+        .neo-shadow {
+            box-shadow: 5px 5px 0px var(--border-black) !important;
+        }
+
+        .neo-card {
+            border: 3px solid var(--border-black) !important;
+            border-radius: 0 !important;
+            box-shadow: 5px 5px 0px var(--border-black) !important;
+            background: white;
+            padding: 20px;
+            margin-bottom: 25px;
+            transition: all 0.1s;
+        }
+
+        .neo-card-hero { background-color: var(--hero-yellow); }
+        .neo-card-data { background-color: var(--data-pink); }
+        .neo-card-utility { background-color: white; }
+
+        .neo-btn {
+            border: 3px solid var(--border-black) !important;
+            border-radius: 0 !important;
+            box-shadow: 5px 5px 0px var(--border-black) !important;
+            font-family: monospace;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 10px 20px;
+            transition: all 0.1s;
+            background: white;
+            color: black;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .neo-btn:hover {
+            background: var(--border-black);
+            color: white;
+        }
+
+        .neo-btn:active {
+            transform: translate(3px, 3px);
+            box-shadow: 0px 0px 0px var(--border-black) !important;
+        }
+
+        .neo-btn-primary { background-color: var(--hero-yellow); }
+        .neo-btn-secondary { background-color: var(--data-pink); }
+        .neo-btn-danger { background-color: #ff6b6b; }
+        .neo-btn-success { background-color: #51cf66; }
+
+        .neo-input, .form-control, .form-select {
+            border: 3px solid var(--border-black) !important;
+            border-radius: 0 !important;
+            padding: 12px;
+            font-weight: bold;
+            background-color: white !important;
+        }
+
+        .neo-input:focus, .form-control:focus, .form-select:focus {
+            box-shadow: 4px 4px 0px var(--border-black) !important;
+            outline: none;
+        }
+
+        /* LAYOUT */
+        .sidebar {
+            background-color: var(--nav-sage);
+            border-right: 3px solid var(--border-black);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .main-content {
+            padding: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                min-height: auto;
+                border-right: none;
+                border-bottom: 3px solid var(--border-black);
+            }
+        }
+        
+        .alert {
+            border: 3px solid var(--border-black) !important;
+            border-radius: 0 !important;
+            box-shadow: 5px 5px 0px var(--border-black) !important;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid p-0">
+    <div class="row g-0">
+        {% block full_layout %}
+        <div class="col-md-3 col-lg-2 sidebar">
+            {% block sidebar_nav %}
+            <h3 class="mb-4">PU PORTAL</h3>
+            <hr class="border-2 border-dark opacity-100">
+            {% endblock %}
+        </div>
+        <div class="col-md-9 col-lg-10 main-content">
+            <div class="container-fluid">
+                <!-- FLASH MESSAGES -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      <div class="alert alert-{{ category if category != 'danger' else 'warning' }} alert-dismissible fade show mb-4" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+
+                <div class="mb-5">
+                    {% block page_header %}{% endblock %}
+                </div>
+                
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+        {% endblock %}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

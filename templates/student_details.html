@@ -1,90 +1,65 @@
-<!DOCTYPE html>
-<html>
-<head>
+{% extends "base.html" %}
 
-<title>Student Details</title>
+{% block title %}Student Details - {{username}}{% endblock %}
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+{% block sidebar_nav %}
+    {{ super() }}
+    <div class="mb-4">
+        <h5 class="fw-bold mb-1">{{username}}</h5>
+        <p class="small fw-bold text-uppercase opacity-75 mb-0">{{user.register_number}}</p>
+        <p class="small fw-bold text-uppercase text-primary mb-3">{{user.department}} DEPT</p>
+    </div>
+    
+    <div class="d-grid gap-3">
+        <a href="/admin" class="neo-btn neo-btn-primary text-center">Back to Admin</a>
+        <a href="/logout" class="neo-btn neo-btn-danger text-center">Logout</a>
+    </div>
+{% endblock %}
 
-<style>
+{% block page_header %}
+    <h2 class="neo-heading">Student Details</h2>
+    <p class="fw-bold text-uppercase">Academic Record for {{username}}</p>
+{% endblock %}
 
-body{
-    background:#111827;
-    color:white;
-}
+{% block content %}
+    <div class="neo-card neo-card-utility text-center mb-5">
+        <h3 class="mb-0">Current CGPA: <span class="text-primary">{{user.cgpa if user.cgpa else '0.0'}}</span></h3>
+    </div>
 
-.card-dark{
-    background:#1f2937;
-    border-radius:15px;
-    padding:25px;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="container mt-4">
-
-<h2>
-{{username}}
-</h2>
-
-<p class="text-secondary">
-{{user.register_number}} ({{user.department}})
-</p>
-
-<p>
-CGPA : {{user.cgpa}}
-</p>
-
-{% for sem, data in user.gradesData.items() %}
-
-<div class="card-dark mt-4">
-
-<h4>
-Semester {{sem}}
-</h4>
-
-<table class="table table-dark table-bordered mt-3">
-
-<tr>
-<th>Subject</th>
-<th>Grade</th>
-<th>Credit</th>
-</tr>
-
-{% for s in data.subjects %}
-
-<tr>
-<td>{{s.subject}}</td>
-<td>{{s.grade}}</td>
-<td>{{s.credit}}</td>
-</tr>
-
-{% endfor %}
-
-<tr>
-<th colspan="2">SGPA</th>
-<th>{{data.sgpa}}</th>
-</tr>
-
-</table>
-
-</div>
-
-{% endfor %}
-
-<div class="mt-4">
-
-<a href="/admin" class="btn btn-primary">
-Back
-</a>
-
-</div>
-
-</div>
-
-</body>
-</html>
+    <div class="row">
+        {% if user.gradesData %}
+            {% for sem, data in user.gradesData.items() | sort %}
+            <div class="col-lg-6">
+                <div class="neo-card neo-card-data mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="mb-0">Semester {{sem}}</h4>
+                        <div class="neo-border bg-white px-3 py-1 fw-bold">SGPA: {{data.sgpa}}</div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered border-dark fw-bold small text-uppercase mb-0">
+                            <thead class="bg-white">
+                                <tr><th>Subject</th><th>Grade</th><th>Cr</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for s in data.subjects %}
+                                <tr>
+                                    <td>{{s.subject}}</td>
+                                    <td class="text-center">{{s.grade}}</td>
+                                    <td class="text-center">{{s.credit}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="neo-card neo-card-utility text-center">
+                    <p class="mb-0 fw-bold">No academic records found for this student.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

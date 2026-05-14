@@ -1,119 +1,52 @@
-<!-- ==========================================
-templates/admin.html
-========================================== -->
+{% extends "base.html" %}
 
-<!DOCTYPE html>
-<html>
-<head>
+{% block title %}Admin Dashboard - PU CGPA Portal{% endblock %}
 
-<title>Admin Dashboard</title>
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<style>
-
-body{
-    background:#0f172a;
-    color:white;
-}
-
-.card-dark{
-    background:#1e293b;
-    padding:25px;
-    border-radius:15px;
-}
-
-a{
-    text-decoration:none;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="container mt-4">
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Admin Dashboard</h2>
-    <div class="text-info">
-        Logged in as: <strong>{{ admin_username }}</strong>
+{% block sidebar_nav %}
+    {{ super() }}
+    <div class="mb-4">
+        <h5 class="fw-bold mb-1">{{admin_username}}</h5>
+        <p class="small fw-bold text-uppercase opacity-75 mb-3">Administrator</p>
     </div>
-</div>
+    
+    <div class="d-grid gap-3">
+        <a href="/admin/export" class="neo-btn neo-btn-success text-center">Export Results</a>
+        <a href="/logout" class="neo-btn neo-btn-danger text-center">Logout</a>
+    </div>
+{% endblock %}
 
-<div class="text-end mb-3">
+{% block page_header %}
+    <h2 class="neo-heading">Admin Dashboard</h2>
+    <p class="fw-bold">Student Records Management</p>
+{% endblock %}
 
-<a
-    href="/admin/export"
-    class="btn btn-success"
->
-Download Excel Sheet
-</a>
-<a
-    href="/admin/export_full"
-    class="btn btn-warning"
->
-Download Full Subject Excel
-</a>
-
-</div>
-
-<div class="card-dark">
-
-<table class="table table-dark table-bordered">
-
-<tr>
-<th>Name</th>
-<th>Register Number</th>
-<th>Dept</th>
-<th>CGPA</th>
-</tr>
-
-{% for user in users %}
-
-<tr>
-
-<td>
-
-<a
-    href="/admin/user/{{user.username}}"
-    class="text-info"
->
-{{user.username}}
-</a>
-
-</td>
-
-<td>
-{{user.register_number}}
-</td>
-
-<td>
-{{user.department}}
-</td>
-
-<td>
-{{user.cgpa or "-"}}
-</td>
-
-</tr>
-
-{% endfor %}
-
-</table>
-
-</div>
-
-<div class="text-center mt-4">
-
-<a href="/logout" class="btn btn-danger">
-Logout
-</a>
-
-</div>
-
-</div>
-
-</body>
-</html>
+{% block content %}
+    <div class="neo-card neo-card-utility">
+        <div class="table-responsive">
+            <table class="table table-bordered border-dark fw-bold small text-uppercase mb-0">
+                <thead class="bg-white">
+                    <tr>
+                        <th>Username</th>
+                        <th>Reg Number</th>
+                        <th>Dept</th>
+                        <th>CGPA</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.register_number }}</td>
+                        <td>{{ user.department }}</td>
+                        <td>{{ user.cgpa if user.cgpa else '-' }}</td>
+                        <td>
+                            <a href="/admin/user/{{ user.username }}" class="neo-btn neo-btn-primary py-1 px-3">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
