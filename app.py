@@ -9,9 +9,15 @@ import io
 from werkzeug.security import generate_password_hash, check_password_hash
 from openpyxl import Workbook
 from openpyxl.styles import Font
+from dotenv import load_dotenv
+from flask_wtf.csrf import CSRFProtect
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "dev_secret_key_123")
+app.secret_key = os.environ.get("SECRET_KEY")
+csrf = CSRFProtect(app)
 
 DB_FILE = "database.db"
 
@@ -27,11 +33,7 @@ def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # Check if department or is_admin columns exist, if not add them
-    cursor.execute("PRAGMA table_info(users)")
-    columns = [column[1] for column in cursor.fetchall()]
-    
-    # Users table updated with is_admin
+    # Users table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             username TEXT PRIMARY KEY,
@@ -42,6 +44,10 @@ def init_db():
             is_admin BOOLEAN DEFAULT 0
         )
     ''')
+    
+    # Check for missing columns (for migrations)
+    cursor.execute("PRAGMA table_info(users)")
+    columns = [column[1] for column in cursor.fetchall()]
     
     if 'department' not in columns:
         cursor.execute("ALTER TABLE users ADD COLUMN department TEXT DEFAULT 'CSE'")
@@ -115,7 +121,16 @@ def login():
 
         if action == "register":
             username = request.form.get("username", "").strip()
+            dept = request.form.get("department", "CSE")
             
+            if not username or not regno or not password:
+                flash("All fields are required", "danger")
+                return redirect("/")
+            
+            if len(password) < 6:
+                flash("Password must be at least 6 characters long", "danger")
+                return redirect("/")
+
             # Check for existing user by username or register number
             user_by_uname = conn.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
             user_by_regno = conn.execute("SELECT * FROM users WHERE register_number = ?", (regno,)).fetchone()
@@ -125,7 +140,6 @@ def login():
                 flash("User with this username or registration number already exists", "danger")
                 return redirect("/")
             
-            dept = request.form.get("department", "CSE")
             hashed_pw = generate_password_hash(password)
             conn.execute("INSERT INTO users (username, password, register_number, department) VALUES (?, ?, ?, ?)",
                          (username, hashed_pw, regno, dept))
@@ -174,36 +188,38 @@ def dashboard():
         sem = request.form["semester"]
         subjects_config = dept_syllabus[sem]
         
-        # Delete old grades for this semester to overwrite
-        conn.execute("DELETE FROM grades WHERE username = ? AND semester = ?", (username, sem))
+        try:
+            with conn:
+                # Delete old grades for this semester to overwrite
+                conn.execute("DELETE FROM grades WHERE username = ? AND semester = ?", (username, sem))
+                
+                total_credits = 0
+                total_points = 0
+                
+                for i, (sub_name, credit) in enumerate(subjects_config):
+                    grade = request.form.get(f"sub{i}")
+                    if grade:
+                        gp = grade_map[grade]
+                        total_credits += credit
+                        total_points += gp * credit
+                        conn.execute("INSERT INTO grades (username, semester, subject, grade, credit) VALUES (?, ?, ?, ?, ?)",
+                                     (username, sem, sub_name, grade, credit))
+                
+                # Re-calculate CGPA
+                all_grades = conn.execute("SELECT grade, credit FROM grades WHERE username = ?", (username,)).fetchall()
+                total_c = 0
+                total_p = 0
+                for row in all_grades:
+                    total_c += row["credit"]
+                    total_p += grade_map[row["grade"]] * row["credit"]
+                
+                cgpa = round(total_p / total_c, 2) if total_c > 0 else 0
+                conn.execute("UPDATE users SET cgpa = ? WHERE username = ?", (cgpa, username))
+            
+            flash(f"Semester {sem} grades saved!", "success")
+        except sqlite3.Error as e:
+            flash(f"Error saving grades: {e}", "danger")
         
-        total_credits = 0
-        total_points = 0
-        
-        for i, (sub_name, credit) in enumerate(subjects_config):
-            grade = request.form.get(f"sub{i}")
-            if grade:
-                gp = grade_map[grade]
-                total_credits += credit
-                total_points += gp * credit
-                conn.execute("INSERT INTO grades (username, semester, subject, grade, credit) VALUES (?, ?, ?, ?, ?)",
-                             (username, sem, sub_name, grade, credit))
-        
-        conn.commit()
-        
-        # Re-calculate CGPA
-        all_grades = conn.execute("SELECT grade, credit FROM grades WHERE username = ?", (username,)).fetchall()
-        total_c = 0
-        total_p = 0
-        for row in all_grades:
-            total_c += row["credit"]
-            total_p += grade_map[row["grade"]] * row["credit"]
-        
-        cgpa = round(total_p / total_c, 2) if total_c > 0 else 0
-        conn.execute("UPDATE users SET cgpa = ? WHERE username = ?", (cgpa, username))
-        conn.commit()
-        
-        flash(f"Semester {sem} grades saved!", "success")
         return redirect(f"/dashboard?semester={sem}")
 
     # GET REQUEST
@@ -353,4 +369,5 @@ def logout():
     return redirect("/")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    debug_mode = os.environ.get("FLASK_DEBUG", "True").lower() == "true"
+    app.run(debug=debug_mode)
