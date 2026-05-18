@@ -81,6 +81,16 @@
         </div>
 
         <div class="col-lg-7">
+            <!-- PROGRESS CHART -->
+            {% if gradesData %}
+            <div class="neo-card neo-card-utility mb-5">
+                <h4 class="mb-4 neo-heading">Academic Progress</h4>
+                <div style="height: 300px;">
+                    <canvas id="sgpaChart"></canvas>
+                </div>
+            </div>
+            {% endif %}
+
             <h4 class="mb-4 neo-heading">Academic History</h4>
             <!-- SAVED SEMESTERS TABLES -->
             {% if gradesData %}
@@ -115,4 +125,62 @@
             {% endif %}
         </div>
     </div>
+{% endblock %}
+
+{% block scripts %}
+{% if gradesData %}
+<script>
+    const ctx = document.getElementById('sgpaChart').getContext('2d');
+    
+    // Data preparation
+    const semData = {
+        {% for sem, data in gradesData.items() | sort %}
+        "{{sem}}": {{data.sgpa}},
+        {% endfor %}
+    };
+    
+    const labels = Object.keys(semData).map(s => 'SEM ' + s);
+    const dataPoints = Object.values(semData);
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'SGPA',
+                data: dataPoints,
+                borderColor: '#000000',
+                backgroundColor: 'rgba(245, 183, 177, 0.4)',
+                borderWidth: 4,
+                fill: true,
+                tension: 0, 
+                pointBackgroundColor: '#F4D03F',
+                pointBorderColor: '#000000',
+                pointBorderWidth: 3,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 10,
+                    grid: { color: '#000000', lineWidth: 1 },
+                    ticks: { font: { weight: 'bold', family: 'monospace' }, color: '#000000' }
+                },
+                x: {
+                    grid: { color: '#000000', lineWidth: 1 },
+                    ticks: { font: { weight: 'bold', family: 'monospace' }, color: '#000000' }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+</script>
+{% endif %}
 {% endblock %}
