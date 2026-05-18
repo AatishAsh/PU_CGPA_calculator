@@ -27,6 +27,34 @@
     </div>
 
     <div class="row">
+        <!-- MANAGEMENT CARD -->
+        <div class="col-lg-12 mb-5">
+            <div class="neo-card neo-card-hero">
+                <h4 class="mb-4">Manage Account</h4>
+                <form action="/admin/edit/{{ username }}" method="POST" class="row g-3 align-items-end">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">FULL NAME</label>
+                        <input type="text" name="username" class="form-control" value="{{ username }}" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">DEPARTMENT</label>
+                        <select name="department" class="form-select">
+                            <option value="CSE" {% if user.department == 'CSE' %}selected{% endif %}>CSE</option>
+                            <option value="IT" {% if user.department == 'IT' %}selected{% endif %}>IT</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">RESET PASSWORD</label>
+                        <input type="password" name="password" class="form-control" placeholder="New Password">
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="neo-btn neo-btn-primary w-100">Update Student</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         {% if user.gradesData %}
             {% for sem, data in user.gradesData.items() | sort %}
             <div class="col-lg-6">

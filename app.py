@@ -276,9 +276,34 @@ def admin():
 
     admin_username = session.get("admin_user", "Admin")
     conn = get_db_connection()
-    users = conn.execute("SELECT username, register_number, department, cgpa FROM users").fetchall()
+    
+    # Filtering logic
+    filter_dept = request.args.get("department", "")
+    filter_cgpa = request.args.get("min_cgpa", "")
+    
+    query = "SELECT username, register_number, department, cgpa FROM users WHERE is_admin = 0"
+    params = []
+    
+    if filter_dept:
+        query += " AND department = ?"
+        params.append(filter_dept)
+        
+    if filter_cgpa:
+        try:
+            min_cgpa_val = float(filter_cgpa)
+            query += " AND cgpa >= ?"
+            params.append(min_cgpa_val)
+        except ValueError:
+            filter_cgpa = "" # Reset if invalid
+            
+    users = conn.execute(query, params).fetchall()
     conn.close()
-    return render_template("admin.html", users=users, admin_username=admin_username)
+    
+    return render_template("admin.html", 
+                           users=users, 
+                           admin_username=admin_username, 
+                           filter_dept=filter_dept, 
+                           filter_cgpa=filter_cgpa)
 
 # ==========================================
 # ADMIN USER DETAILS
@@ -313,6 +338,79 @@ def admin_user(username):
     user_dict["gradesData"] = gradesData
     
     return render_template("student_details.html", username=username, user=user_dict)
+
+# ==========================================
+# ADMIN EDIT USER
+# ==========================================
+@app.route("/admin/edit/<username>", methods=["POST"])
+def admin_edit(username):
+    if "admin" not in session:
+        return redirect("/")
+
+    conn = get_db_connection()
+    new_username = request.form.get("username").strip()
+    new_dept = request.form.get("department")
+    new_password = request.form.get("password")
+
+    if not new_username:
+        flash("Student name cannot be empty.", "danger")
+        return redirect(f"/admin/user/{username}")
+
+    try:
+        with conn:
+            # Handle username change
+            if new_username != username:
+                existing = conn.execute("SELECT * FROM users WHERE username = ?", (new_username,)).fetchone()
+                if existing:
+                    flash("This name is already taken by another user.", "danger")
+                    return redirect(f"/admin/user/{username}")
+                
+                # Update users and grades
+                conn.execute("UPDATE users SET username = ? WHERE username = ?", (new_username, username))
+                conn.execute("UPDATE grades SET username = ? WHERE username = ?", (new_username, username))
+                username = new_username
+
+            # Update department
+            conn.execute("UPDATE users SET department = ? WHERE username = ?", (new_dept, username))
+
+            # Update password if provided
+            if new_password:
+                if len(new_password) < 6:
+                    flash("Password must be at least 6 characters.", "danger")
+                    return redirect(f"/admin/user/{username}")
+                hashed_pw = generate_password_hash(new_password)
+                conn.execute("UPDATE users SET password = ? WHERE username = ?", (hashed_pw, username))
+
+        flash("Student profile updated successfully!", "success")
+    except sqlite3.Error as e:
+        flash(f"Database Error: {e}", "danger")
+    finally:
+        conn.close()
+
+    return redirect(f"/admin/user/{username}")
+
+# ==========================================
+# ADMIN DELETE USER
+# ==========================================
+@app.route("/admin/delete/<username>", methods=["POST"])
+def admin_delete(username):
+    if "admin" not in session:
+        return redirect("/")
+
+    conn = get_db_connection()
+    try:
+        with conn:
+            # Delete grades first to maintain data integrity
+            conn.execute("DELETE FROM grades WHERE username = ?", (username,))
+            # Delete the user
+            conn.execute("DELETE FROM users WHERE username = ?", (username,))
+        flash(f"Student {username} and their data have been deleted.", "success")
+    except sqlite3.Error as e:
+        flash(f"Error deleting user: {e}", "danger")
+    finally:
+        conn.close()
+
+    return redirect("/admin")
 
 # ==========================================
 # EXPORT EXCEL (IN-MEMORY)
@@ -362,6 +460,63 @@ def export_excel():
     output.seek(0)
     
     return send_file(output, as_attachment=True, download_name="student_results.xlsx", mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+# ==========================================
+# STUDENT PROFILE
+# ==========================================
+@app.route("/profile", methods=["GET", "POST"])
+def profile():
+    if "user" not in session:
+        return redirect("/")
+        
+    current_username = session["user"]
+    conn = get_db_connection()
+    
+    if request.method == "POST":
+        new_username = request.form.get("username").strip()
+        new_dept = request.form.get("department")
+        new_password = request.form.get("password")
+        
+        if not new_username:
+            flash("Name cannot be empty.", "danger")
+            return redirect("/profile")
+            
+        try:
+            with conn:
+                # Handle username change
+                if new_username != current_username:
+                    existing = conn.execute("SELECT * FROM users WHERE username = ?", (new_username,)).fetchone()
+                    if existing:
+                        flash("This name is already taken.", "danger")
+                        return redirect("/profile")
+                        
+                    # Update users and grades tables (username acts as PK)
+                    conn.execute("UPDATE users SET username = ? WHERE username = ?", (new_username, current_username))
+                    conn.execute("UPDATE grades SET username = ? WHERE username = ?", (new_username, current_username))
+                    session["user"] = new_username
+                    current_username = new_username
+                
+                # Update department
+                conn.execute("UPDATE users SET department = ? WHERE username = ?", (new_dept, current_username))
+                session["department"] = new_dept
+                
+                # Update password if provided
+                if new_password:
+                    if len(new_password) < 6:
+                        flash("Password must be at least 6 characters.", "danger")
+                        return redirect("/profile")
+                    hashed_pw = generate_password_hash(new_password)
+                    conn.execute("UPDATE users SET password = ? WHERE username = ?", (hashed_pw, current_username))
+                    
+            flash("Profile updated successfully!", "success")
+        except sqlite3.Error as e:
+            flash(f"Database Error: {e}", "danger")
+            
+        return redirect("/profile")
+        
+    user = conn.execute("SELECT * FROM users WHERE username = ?", (current_username,)).fetchone()
+    conn.close()
+    return render_template("profile.html", user=user)
 
 @app.route("/logout")
 def logout():

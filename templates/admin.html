@@ -21,6 +21,31 @@
 {% endblock %}
 
 {% block content %}
+    <!-- FILTERS -->
+    <div class="neo-card neo-card-utility mb-4">
+        <h4 class="mb-3">Filter Students</h4>
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-bold">DEPARTMENT</label>
+                <select name="department" class="form-select">
+                    <option value="">ALL DEPARTMENTS</option>
+                    <option value="CSE" {% if filter_dept == 'CSE' %}selected{% endif %}>CSE (Computer Science)</option>
+                    <option value="IT" {% if filter_dept == 'IT' %}selected{% endif %}>IT (Information Technology)</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">MINIMUM CGPA</label>
+                <input type="number" name="min_cgpa" class="form-control" step="0.01" min="0" max="10" placeholder="e.g. 8.5" value="{{ filter_cgpa }}">
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex gap-2">
+                    <button type="submit" class="neo-btn neo-btn-primary flex-grow-1">Apply</button>
+                    <a href="/admin" class="neo-btn flex-grow-1 text-center">Clear</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
     <div class="neo-card neo-card-utility">
         <div class="table-responsive">
             <table class="table table-bordered border-dark fw-bold small text-uppercase mb-0">
@@ -41,7 +66,13 @@
                         <td>{{ user.department }}</td>
                         <td>{{ user.cgpa if user.cgpa else '-' }}</td>
                         <td>
-                            <a href="/admin/user/{{ user.username }}" class="neo-btn neo-btn-primary py-1 px-3">View</a>
+                            <div class="d-flex gap-2">
+                                <a href="/admin/user/{{ user.username }}" class="neo-btn neo-btn-primary py-1 px-3">View</a>
+                                <form action="/admin/delete/{{ user.username }}" method="POST" onsubmit="return confirm('ARE YOU SURE YOU WANT TO DELETE THIS STUDENT AND ALL THEIR DATA?');" style="display: inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="neo-btn neo-btn-danger py-1 px-3">Delete</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
