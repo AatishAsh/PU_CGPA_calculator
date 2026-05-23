@@ -98,7 +98,13 @@
                 <div class="neo-card neo-card-data mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h4 class="mb-0">Semester {{sem}}</h4>
-                        <div class="neo-border bg-white px-3 py-1 fw-bold">SGPA: {{data.sgpa}}</div>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="neo-border bg-white px-3 py-1 fw-bold">SGPA: {{data.sgpa}}</div>
+                            <form action="/dashboard/clear/{{sem}}" method="POST" onsubmit="return confirm('ARE YOU SURE YOU WANT TO CLEAR ALL GRADES FOR SEMESTER {{sem}}?');" class="m-0">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="neo-btn neo-btn-danger d-flex align-items-center justify-content-center fw-bold small" title="Clear Semester" style="box-shadow: none !important; width: 35px; height: 35px; padding: 0;">X</button>
+                            </form>
+                        </div>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-bordered border-dark fw-bold small text-uppercase mb-0">

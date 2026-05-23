@@ -23,9 +23,13 @@
 {% block content %}
     <!-- FILTERS -->
     <div class="neo-card neo-card-utility mb-4">
-        <h4 class="mb-3">Filter Students</h4>
+        <h4 class="mb-3">Filter & Search</h4>
         <form method="GET" class="row g-3 align-items-end">
-            <div class="col-md-4">
+            <div class="col-md-3">
+                <label class="form-label fw-bold">SEARCH</label>
+                <input type="text" name="search" class="form-control" placeholder="Name or Reg No..." value="{{ search_query }}">
+            </div>
+            <div class="col-md-3">
                 <label class="form-label fw-bold">DEPARTMENT</label>
                 <select name="department" class="form-select">
                     <option value="">ALL DEPARTMENTS</option>
@@ -33,11 +37,11 @@
                     <option value="IT" {% if filter_dept == 'IT' %}selected{% endif %}>IT (Information Technology)</option>
                 </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label class="form-label fw-bold">MINIMUM CGPA</label>
                 <input type="number" name="min_cgpa" class="form-control" step="0.01" min="0" max="10" placeholder="e.g. 8.5" value="{{ filter_cgpa }}">
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="d-flex gap-2">
                     <button type="submit" class="neo-btn neo-btn-primary flex-grow-1">Apply</button>
                     <a href="/admin" class="neo-btn flex-grow-1 text-center">Clear</a>
@@ -51,10 +55,43 @@
             <table class="table table-bordered border-dark fw-bold small text-uppercase mb-0">
                 <thead class="bg-white">
                     <tr>
-                        <th>Username</th>
-                        <th>Reg Number</th>
+                        <th>
+                            <a href="/admin?sort=username&order={{ 'desc' if sort_by == 'username' and order == 'asc' else 'asc' }}{% if filter_dept %}&department={{ filter_dept }}{% endif %}{% if filter_cgpa %}&min_cgpa={{ filter_cgpa }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+                                Username
+                                <span class="ms-1">
+                                    {% if sort_by == 'username' %}
+                                        {{ '↑' if order == 'asc' else '↓' }}
+                                    {% else %}
+                                        <span class="opacity-25">⇅</span>
+                                    {% endif %}
+                                </span>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="/admin?sort=register_number&order={{ 'desc' if sort_by == 'register_number' and order == 'asc' else 'asc' }}{% if filter_dept %}&department={{ filter_dept }}{% endif %}{% if filter_cgpa %}&min_cgpa={{ filter_cgpa }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+                                Reg Number
+                                <span class="ms-1">
+                                    {% if sort_by == 'register_number' %}
+                                        {{ '↑' if order == 'asc' else '↓' }}
+                                    {% else %}
+                                        <span class="opacity-25">⇅</span>
+                                    {% endif %}
+                                </span>
+                            </a>
+                        </th>
                         <th>Dept</th>
-                        <th>CGPA</th>
+                        <th>
+                            <a href="/admin?sort=cgpa&order={{ 'desc' if sort_by == 'cgpa' and order == 'asc' else 'asc' }}{% if filter_dept %}&department={{ filter_dept }}{% endif %}{% if filter_cgpa %}&min_cgpa={{ filter_cgpa }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+                                CGPA
+                                <span class="ms-1">
+                                    {% if sort_by == 'cgpa' %}
+                                        {{ '↑' if order == 'asc' else '↓' }}
+                                    {% else %}
+                                        <span class="opacity-25">⇅</span>
+                                    {% endif %}
+                                </span>
+                            </a>
+                        </th>
                         <th>Action</th>
                     </tr>
                 </thead>

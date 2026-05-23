@@ -266,6 +266,38 @@ def dashboard():
         current_sem_grades=current_sem_grades
     )
 
+@app.route("/dashboard/clear/<sem>", methods=["POST"])
+def clear_semester(sem):
+    if "user" not in session:
+        return redirect("/")
+    
+    username = session["user"]
+    conn = get_db_connection()
+    
+    try:
+        with conn:
+            # Delete grades for this semester
+            conn.execute("DELETE FROM grades WHERE username = ? AND semester = ?", (username, sem))
+            
+            # Recalculate CGPA
+            all_grades = conn.execute("SELECT grade, credit FROM grades WHERE username = ?", (username,)).fetchall()
+            total_c = 0
+            total_p = 0
+            for row in all_grades:
+                total_c += row["credit"]
+                total_p += grade_map[row["grade"]] * row["credit"]
+            
+            cgpa = round(total_p / total_c, 2) if total_c > 0 else 0
+            conn.execute("UPDATE users SET cgpa = ? WHERE username = ?", (cgpa, username))
+            
+        flash(f"Semester {sem} grades cleared!", "success")
+    except sqlite3.Error as e:
+        flash(f"Error clearing grades: {e}", "danger")
+    finally:
+        conn.close()
+        
+    return redirect("/dashboard")
+
 # ==========================================
 # ADMIN DASHBOARD
 # ==========================================
@@ -280,6 +312,18 @@ def admin():
     # Filtering logic
     filter_dept = request.args.get("department", "")
     filter_cgpa = request.args.get("min_cgpa", "")
+    search_query = request.args.get("search", "").strip()
+    
+    # Sorting logic
+    sort_by = request.args.get("sort", "username")
+    order = request.args.get("order", "asc")
+    
+    # Validate sorting parameters to prevent SQL injection
+    valid_columns = ["username", "register_number", "department", "cgpa"]
+    if sort_by not in valid_columns:
+        sort_by = "username"
+    if order not in ["asc", "desc"]:
+        order = "asc"
     
     query = "SELECT username, register_number, department, cgpa FROM users WHERE is_admin = 0"
     params = []
@@ -295,6 +339,14 @@ def admin():
             params.append(min_cgpa_val)
         except ValueError:
             filter_cgpa = "" # Reset if invalid
+
+    if search_query:
+        query += " AND (username LIKE ? OR register_number LIKE ?)"
+        params.append(f"%{search_query}%")
+        params.append(f"%{search_query}%")
+            
+    # Add sorting to query
+    query += f" ORDER BY {sort_by} {order.upper()}"
             
     users = conn.execute(query, params).fetchall()
     conn.close()
@@ -303,7 +355,10 @@ def admin():
                            users=users, 
                            admin_username=admin_username, 
                            filter_dept=filter_dept, 
-                           filter_cgpa=filter_cgpa)
+                           filter_cgpa=filter_cgpa,
+                           search_query=search_query,
+                           sort_by=sort_by,
+                           order=order)
 
 # ==========================================
 # ADMIN USER DETAILS
