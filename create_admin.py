@@ -1,9 +1,7 @@
-import sqlite3
 import getpass
 from werkzeug.security import generate_password_hash
 import os
-
-DB_FILE = "database.db"
+from utils.db import get_db_connection
 
 def create_admin():
     print("--- Create New Admin User ---")
@@ -24,12 +22,8 @@ def create_admin():
 
     hashed_pw = generate_password_hash(password)
 
-    if not os.path.exists(DB_FILE):
-        print(f"Error: {DB_FILE} not found. Please run app.py first to initialize the database.")
-        return
-
     try:
-        conn = sqlite3.connect(DB_FILE)
+        conn = get_db_connection()
         cursor = conn.cursor()
         
         # Check if user already exists
@@ -47,8 +41,8 @@ def create_admin():
         conn.close()
         print(f"Successfully created admin user: {username}")
 
-    except sqlite3.Error as e:
-        print(f"Database error: {e}")
+    except Exception as e:
+        print(f"Error: {e}")
 
 if __name__ == "__main__":
     create_admin()

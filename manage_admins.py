@@ -1,18 +1,8 @@
-import sqlite3
 import getpass
 from werkzeug.security import generate_password_hash
 import os
 import sys
-
-DB_FILE = "database.db"
-
-def get_db_connection():
-    if not os.path.exists(DB_FILE):
-        print(f"Error: {DB_FILE} not found. Please run app.py first to initialize the database.")
-        sys.exit(1)
-    conn = sqlite3.connect(DB_FILE)
-    conn.row_factory = sqlite3.Row
-    return conn
+from utils.db import get_db_connection
 
 def list_admins():
     conn = get_db_connection()
@@ -70,8 +60,8 @@ def create_admin():
         conn.close()
         print(f"Successfully created admin user: {username}")
 
-    except sqlite3.Error as e:
-        print(f"Database error: {e}")
+    except Exception as e:
+        print(f"Error: {e}")
 
 def delete_admin():
     list_admins()
@@ -100,8 +90,8 @@ def delete_admin():
         conn.close()
         print(f"Successfully deleted admin user: {username}")
 
-    except sqlite3.Error as e:
-        print(f"Database error: {e}")
+    except Exception as e:
+        print(f"Error: {e}")
 
 def main():
     while True:
