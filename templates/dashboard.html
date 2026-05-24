@@ -159,7 +159,7 @@
                 backgroundColor: 'rgba(245, 183, 177, 0.4)',
                 borderWidth: 4,
                 fill: true,
-                tension: 0, 
+                tension: 0.1, 
                 pointBackgroundColor: '#F4D03F',
                 pointBorderColor: '#000000',
                 pointBorderWidth: 3,
@@ -173,9 +173,15 @@
             scales: {
                 y: {
                     beginAtZero: true,
+                    min: 0,
                     max: 10,
                     grid: { color: '#000000', lineWidth: 1 },
-                    ticks: { font: { weight: 'bold', family: 'monospace' }, color: '#000000' }
+                    ticks: { 
+                        stepSize: 2,
+                        padding: 10,
+                        font: { weight: 'bold', family: 'monospace' }, 
+                        color: '#000000' 
+                    }
                 },
                 x: {
                     grid: { color: '#000000', lineWidth: 1 },
