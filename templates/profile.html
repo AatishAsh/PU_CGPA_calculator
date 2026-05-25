@@ -42,15 +42,18 @@
 
                 <div class="mb-3">
                     <label class="form-label fw-bold text-uppercase">Department</label>
-                    <select name="department" class="form-select">
-                        <option value="CSE" {% if user.department == 'CSE' %}selected{% endif %}>CSE (Computer Science)</option>
-                        <option value="IT" {% if user.department == 'IT' %}selected{% endif %}>IT (Information Technology)</option>
-                    </select>
+                    <input type="text" class="form-control bg-light" value="{{user.department}}" readonly disabled>
+                    <div class="small fw-bold mt-1 opacity-75">CONTACT ADMIN TO CHANGE DEPARTMENT</div>
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label fw-bold text-uppercase">New Password</label>
-                    <input type="password" name="password" class="form-control" placeholder="Leave blank to keep current">
+                    <div class="input-group">
+                        <input type="password" id="profileNewPassword" name="password" class="form-control" placeholder="Leave blank to keep current">
+                        <button class="btn btn-outline-secondary" type="button" id="toggleProfilePassword" aria-label="Show or hide new password">
+                            <span id="toggleProfilePasswordIcon" aria-hidden="true">&#128065;</span>
+                        </button>
+                    </div>
                 </div>
 
                 <button type="submit" class="neo-btn neo-btn-primary w-100">Save Changes</button>
@@ -74,4 +77,15 @@
         </div>
     </div>
 </div>
+<script>
+    const profileNewPasswordInput = document.getElementById('profileNewPassword');
+    const toggleProfilePasswordBtn = document.getElementById('toggleProfilePassword');
+    const toggleProfilePasswordIcon = document.getElementById('toggleProfilePasswordIcon');
+
+    toggleProfilePasswordBtn.addEventListener('click', function () {
+        const isPassword = profileNewPasswordInput.type === 'password';
+        profileNewPasswordInput.type = isPassword ? 'text' : 'password';
+        toggleProfilePasswordIcon.innerHTML = isPassword ? '&#128584;' : '&#128065;';
+    });
+</script>
 {% endblock %}
