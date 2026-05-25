@@ -50,8 +50,8 @@
                     <label class="form-label fw-bold text-uppercase">New Password</label>
                     <div class="input-group">
                         <input type="password" id="profileNewPassword" name="password" class="form-control" placeholder="Leave blank to keep current">
-                        <button class="btn btn-outline-secondary" type="button" id="toggleProfilePassword" aria-label="Show or hide new password">
-                            <span id="toggleProfilePasswordIcon" aria-hidden="true">&#128065;</span>
+                        <button class="neo-toggle" type="button" id="toggleProfilePassword" aria-label="Show or hide new password">
+                            <i id="toggleProfilePasswordIcon" class="bi bi-eye"></i>
                         </button>
                     </div>
                 </div>
@@ -85,7 +85,7 @@
     toggleProfilePasswordBtn.addEventListener('click', function () {
         const isPassword = profileNewPasswordInput.type === 'password';
         profileNewPasswordInput.type = isPassword ? 'text' : 'password';
-        toggleProfilePasswordIcon.innerHTML = isPassword ? '&#128584;' : '&#128065;';
+        toggleProfilePasswordIcon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
     });
 </script>
 {% endblock %}

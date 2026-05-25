@@ -50,8 +50,8 @@
                         <label class="form-label fw-bold">PASSWORD</label>
                         <div class="input-group">
                             <input type="password" id="registerPassword" name="password" class="form-control" placeholder="******" required>
-                            <button class="btn btn-outline-secondary" type="button" id="toggleRegisterPassword" aria-label="Show or hide password">
-                                <span id="toggleRegisterPasswordIcon" aria-hidden="true">&#128065;</span>
+                            <button class="neo-toggle" type="button" id="toggleRegisterPassword" aria-label="Show or hide password">
+                                <i id="toggleRegisterPasswordIcon" class="bi bi-eye"></i>
                             </button>
                         </div>
                     </div>
@@ -60,8 +60,8 @@
                         <label class="form-label fw-bold">CONFIRM PASSWORD</label>
                         <div class="input-group">
                             <input type="password" id="registerConfirmPassword" name="confirm_password" class="form-control" placeholder="******" required>
-                            <button class="btn btn-outline-secondary" type="button" id="toggleRegisterConfirmPassword" aria-label="Show or hide confirm password">
-                                <span id="toggleRegisterConfirmPasswordIcon" aria-hidden="true">&#128065;</span>
+                            <button class="neo-toggle" type="button" id="toggleRegisterConfirmPassword" aria-label="Show or hide confirm password">
+                                <i id="toggleRegisterConfirmPasswordIcon" class="bi bi-eye"></i>
                             </button>
                         </div>
                     </div>
@@ -89,9 +89,12 @@
                         <label class="form-label fw-bold">PASSWORD</label>
                         <div class="input-group">
                             <input type="password" id="loginPassword" name="password" class="form-control" placeholder="******" required>
-                            <button class="btn btn-outline-secondary" type="button" id="toggleLoginPassword" aria-label="Show or hide login password">
-                                <span id="toggleLoginPasswordIcon" aria-hidden="true">&#128065;</span>
+                            <button class="neo-toggle" type="button" id="toggleLoginPassword" aria-label="Show or hide login password">
+                                <i id="toggleLoginPasswordIcon" class="bi bi-eye"></i>
                             </button>
+                        </div>
+                        <div class="text-end mt-1">
+                            <a href="/forgot-password" class="small fw-bold text-dark text-decoration-underline">FORGOT PASSWORD?</a>
                         </div>
                     </div>
 
@@ -145,27 +148,31 @@
     toggleRegisterPasswordBtn.addEventListener('click', function () {
         const isPassword = registerPasswordInput.type === 'password';
         registerPasswordInput.type = isPassword ? 'text' : 'password';
-        toggleRegisterPasswordIcon.innerHTML = isPassword ? '&#128584;' : '&#128065;';
+        toggleRegisterPasswordIcon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
     });
 
     toggleRegisterConfirmPasswordBtn.addEventListener('click', function () {
         const isPassword = registerConfirmPasswordInput.type === 'password';
         registerConfirmPasswordInput.type = isPassword ? 'text' : 'password';
-        toggleRegisterConfirmPasswordIcon.innerHTML = isPassword ? '&#128584;' : '&#128065;';
+        toggleRegisterConfirmPasswordIcon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
     });
 
     toggleLoginPasswordBtn.addEventListener('click', function () {
         const isPassword = loginPasswordInput.type === 'password';
         loginPasswordInput.type = isPassword ? 'text' : 'password';
-        toggleLoginPasswordIcon.innerHTML = isPassword ? '&#128584;' : '&#128065;';
+        toggleLoginPasswordIcon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
     });
 
-    registerForm.addEventListener('submit', function (event) {
+    function validatePasswords() {
         if (registerPasswordInput.value !== registerConfirmPasswordInput.value) {
-            event.preventDefault();
-            alert('Password and confirm password must match.');
+            registerConfirmPasswordInput.setCustomValidity("Passwords do not match");
+        } else {
+            registerConfirmPasswordInput.setCustomValidity("");
         }
-    });
+    }
+
+    registerPasswordInput.addEventListener('input', validatePasswords);
+    registerConfirmPasswordInput.addEventListener('input', validatePasswords);
 
     window.addEventListener('load', function () {
         clearRegisterForm();

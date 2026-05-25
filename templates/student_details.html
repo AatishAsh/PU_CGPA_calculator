@@ -58,7 +58,12 @@
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold">RESET PASSWORD</label>
-                        <input type="password" name="password" class="form-control" placeholder="New Password">
+                        <div class="input-group">
+                            <input type="password" id="adminResetPassword" name="password" class="form-control" placeholder="New Password">
+                            <button class="neo-toggle" type="button" id="toggleAdminResetPassword" aria-label="Show or hide reset password">
+                                <i id="toggleAdminResetPasswordIcon" class="bi bi-eye"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="col-md-3">
                         <button type="submit" class="neo-btn neo-btn-primary w-100">Update Student</button>
@@ -76,16 +81,16 @@
                         <div class="neo-border bg-white px-3 py-1 fw-bold">SGPA: {{data.sgpa}}</div>
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-bordered border-dark fw-bold small text-uppercase mb-0">
+                        <table class="table table-bordered border-dark fw-bold small text-uppercase mb-0 neo-table-compact">
                             <thead class="bg-white">
-                                <tr><th>Subject</th><th>Grade</th><th>Cr</th></tr>
+                                <tr><th>Subject</th><th>Grade</th><th class="hide-mobile">Cr</th></tr>
                             </thead>
                             <tbody>
                                 {% for s in data.subjects %}
                                 <tr>
                                     <td>{{s.subject}}</td>
                                     <td class="text-center">{{s.grade}}</td>
-                                    <td class="text-center">{{s.credit}}</td>
+                                    <td class="text-center hide-mobile">{{s.credit}}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -107,6 +112,16 @@
 {% block scripts %}
 {% if user.gradesData %}
 <script>
+    const adminResetPasswordInput = document.getElementById('adminResetPassword');
+    const toggleAdminResetPasswordBtn = document.getElementById('toggleAdminResetPassword');
+    const toggleAdminResetPasswordIcon = document.getElementById('toggleAdminResetPasswordIcon');
+
+    toggleAdminResetPasswordBtn.addEventListener('click', function () {
+        const isPassword = adminResetPasswordInput.type === 'password';
+        adminResetPasswordInput.type = isPassword ? 'text' : 'password';
+        toggleAdminResetPasswordIcon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
+    });
+
     const ctx = document.getElementById('sgpaChart').getContext('2d');
     
     // Data preparation

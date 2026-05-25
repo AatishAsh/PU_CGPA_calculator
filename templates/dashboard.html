@@ -107,16 +107,16 @@
                         </div>
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-bordered border-dark fw-bold small text-uppercase mb-0">
+                        <table class="table table-bordered border-dark fw-bold small text-uppercase mb-0 neo-table-compact">
                             <thead class="bg-white">
-                                <tr><th>Subject</th><th>Grade</th><th>Cr</th></tr>
+                                <tr><th>Subject</th><th>Grade</th><th class="hide-mobile">Cr</th></tr>
                             </thead>
                             <tbody>
                                 {% for s in data.subjects %}
                                 <tr>
                                     <td>{{s.subject}}</td>
                                     <td class="text-center">{{s.grade}}</td>
-                                    <td class="text-center">{{s.credit}}</td>
+                                    <td class="text-center hide-mobile">{{s.credit}}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

@@ -16,9 +16,14 @@ def login():
         if action == "register":
             username = request.form.get("username", "").strip()
             dept = request.form.get("department", "CSE")
+            confirm_password = request.form.get("confirm_password")
             
-            if not username or not regno or not password:
+            if not username or not regno or not password or not confirm_password:
                 flash("All fields are required", "danger")
+                return redirect("/")
+            
+            if password != confirm_password:
+                flash("Password and confirm password must match", "danger")
                 return redirect("/")
             
             if len(password) < 6:
@@ -122,3 +127,7 @@ def profile():
 def logout():
     session.clear()
     return redirect("/")
+
+@auth_bp.route("/forgot-password")
+def forgot_password():
+    return render_template("forgot_password.html")
