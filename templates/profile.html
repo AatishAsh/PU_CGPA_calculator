@@ -5,9 +5,14 @@
 {% block sidebar_nav %}
     {{ super() }}
     <div class="mb-4">
-        <h5 class="fw-bold mb-1">{{user.username}}</h5>
-        <p class="small fw-bold text-uppercase opacity-75 mb-0">{{user.register_number}}</p>
-        <p class="small fw-bold text-uppercase text-primary mb-3">{{user.department}} DEPT</p>
+        <div class="d-flex flex-md-column align-items-center align-items-md-start gap-3">
+            <img src="/img/{{ user.profile_pic }}" class="neo-avatar" alt="Profile">
+            <div>
+                <h5 class="fw-bold mb-1 text-break">{{user.username}}</h5>
+                <p class="small fw-bold text-uppercase opacity-75 mb-0">{{user.register_number}}</p>
+                <p class="small fw-bold text-uppercase text-primary mb-0">{{user.department}} DEPT</p>
+            </div>
+        </div>
     </div>
     
     <div class="d-grid gap-3">
@@ -56,6 +61,22 @@
                     </div>
                 </div>
 
+                <div class="mb-4">
+                    <label class="form-label fw-bold text-uppercase">Select Avatar</label>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for img in ['default.png', 'cat01.png', 'cat02.png', 'cat03.png', 'hamster.png', 'tux.png'] %}
+                        <div class="neo-avatar-container">
+                            <img src="/img/{{ img }}" 
+                                 class="neo-avatar-lg {% if user.profile_pic == img %}neo-avatar-selected{% endif %}" 
+                                 onclick="selectAvatar('{{ img }}', this)"
+                                 data-filename="{{ img }}"
+                                 alt="Avatar">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" name="profile_pic" id="selectedProfilePic" value="{{ user.profile_pic }}">
+                </div>
+
                 <button type="submit" class="neo-btn neo-btn-primary w-100">Save Changes</button>
             </form>
         </div>
@@ -78,6 +99,17 @@
     </div>
 </div>
 <script>
+    function selectAvatar(filename, element) {
+        // Update hidden input
+        document.getElementById('selectedProfilePic').value = filename;
+        
+        // Update visual selection
+        document.querySelectorAll('.neo-avatar-lg').forEach(img => {
+            img.classList.remove('neo-avatar-selected');
+        });
+        element.classList.add('neo-avatar-selected');
+    }
+
     const profileNewPasswordInput = document.getElementById('profileNewPassword');
     const toggleProfilePasswordBtn = document.getElementById('toggleProfilePassword');
     const toggleProfilePasswordIcon = document.getElementById('toggleProfilePasswordIcon');

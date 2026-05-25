@@ -95,7 +95,8 @@ def dashboard():
         username=username,
         register_number=user_row["register_number"],
         department=dept,
-        current_sem_grades=current_sem_grades
+        current_sem_grades=current_sem_grades,
+        profile_pic=user_row["profile_pic"]
     )
 
 @student_bp.route("/dashboard/clear/<sem>", methods=["POST"])

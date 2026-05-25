@@ -5,9 +5,14 @@
 {% block sidebar_nav %}
     {{ super() }}
     <div class="mb-4">
-        <h5 class="fw-bold mb-1">{{username}}</h5>
-        <p class="small fw-bold text-uppercase opacity-75 mb-0">{{user.register_number}}</p>
-        <p class="small fw-bold text-uppercase text-primary mb-3">{{user.department}} DEPT</p>
+        <div class="d-flex flex-md-column align-items-center align-items-md-start gap-3">
+            <img src="/img/{{ user.profile_pic }}" class="neo-avatar" alt="Profile">
+            <div>
+                <h5 class="fw-bold mb-1 text-break">{{username}}</h5>
+                <p class="small fw-bold text-uppercase opacity-75 mb-0">{{user.register_number}}</p>
+                <p class="small fw-bold text-uppercase text-primary mb-0">{{user.department}} DEPT</p>
+            </div>
+        </div>
     </div>
     
     <div class="d-grid gap-3">

@@ -113,6 +113,35 @@
             transition: box-shadow 0.15s ease-in-out !important;
         }
 
+        .neo-avatar {
+            width: 90px;
+            height: 90px;
+            border: 3px solid var(--border-black);
+            background-color: white;
+            object-fit: cover;
+        }
+
+        .neo-avatar-lg {
+            width: 70px;
+            height: 70px;
+            border: 3px solid var(--border-black);
+            background-color: white;
+            object-fit: cover;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+
+        .neo-avatar-lg:hover {
+            box-shadow: 4px 4px 0px var(--border-black);
+            transform: translate(-2px, -2px);
+        }
+
+        .neo-avatar-selected {
+            background-color: var(--hero-yellow) !important;
+            box-shadow: 4px 4px 0px var(--border-black);
+            transform: translate(-2px, -2px);
+        }
+
         .input-group:focus-within .neo-toggle {
             box-shadow: 4px 4px 0px var(--border-black) !important;
         }

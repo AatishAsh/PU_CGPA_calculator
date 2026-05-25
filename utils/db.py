@@ -20,7 +20,8 @@ def init_db():
             register_number TEXT,
             department TEXT DEFAULT 'CSE',
             cgpa REAL,
-            is_admin BOOLEAN DEFAULT 0
+            is_admin BOOLEAN DEFAULT 0,
+            profile_pic TEXT DEFAULT 'default.png'
         )
     ''')
     
@@ -33,6 +34,9 @@ def init_db():
         
     if 'is_admin' not in columns:
         cursor.execute("ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT 0")
+
+    if 'profile_pic' not in columns:
+        cursor.execute("ALTER TABLE users ADD COLUMN profile_pic TEXT DEFAULT 'default.png'")
     
     # Grades table
     cursor.execute('''

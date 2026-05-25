@@ -8,7 +8,7 @@ auth_bp = Blueprint('auth', __name__)
 def login():
     if request.method == "POST":
         action = request.form.get("action")
-        regno = request.form.get("regno", "").strip().upper()
+        regno_input = request.form.get("regno", "").strip()
         password = request.form.get("password")
 
         conn = get_db_connection()
@@ -17,6 +17,7 @@ def login():
             username = request.form.get("username", "").strip()
             dept = request.form.get("department", "CSE")
             confirm_password = request.form.get("confirm_password")
+            regno = regno_input.upper()
             
             if not username or not regno or not password or not confirm_password:
                 flash("All fields are required", "danger")
@@ -48,7 +49,8 @@ def login():
             return redirect("/")
 
         if action == "login":
-            user = conn.execute("SELECT * FROM users WHERE register_number = ?", (regno,)).fetchone()
+            # Search by Upper(Reg Number) OR Raw(Full Name)
+            user = conn.execute("SELECT * FROM users WHERE register_number = ? OR username = ?", (regno_input.upper(), regno_input)).fetchone()
             if user and check_password_hash(user["password"], password):
                 session.clear()
                 
@@ -81,6 +83,7 @@ def profile():
         new_username = request.form.get("username").strip()
         new_dept = request.form.get("department")
         new_password = request.form.get("password")
+        new_profile_pic = request.form.get("profile_pic", "default.png")
         
         if not new_username:
             flash("Name cannot be empty.", "danger")
@@ -88,6 +91,9 @@ def profile():
             
         try:
             with conn:
+                # Update profile picture
+                conn.execute("UPDATE users SET profile_pic = ? WHERE username = ?", (new_profile_pic, current_username))
+
                 # Handle username change
                 if new_username != current_username:
                     existing = conn.execute("SELECT * FROM users WHERE username = ?", (new_username,)).fetchone()

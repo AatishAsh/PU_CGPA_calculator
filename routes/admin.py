@@ -17,6 +17,10 @@ def admin():
     admin_username = session.get("admin_user", "Admin")
     conn = get_db_connection()
     
+    # Fetch admin profile pic
+    admin_row = conn.execute("SELECT profile_pic FROM users WHERE username = ?", (admin_username,)).fetchone()
+    admin_pic = admin_row["profile_pic"] if admin_row else "default.png"
+    
     # Filtering logic
     filter_dept = request.args.get("department", "")
     filter_cgpa = request.args.get("min_cgpa", "")
@@ -77,6 +81,7 @@ def admin():
     return render_template("admin.html", 
                            users=users, 
                            admin_username=admin_username, 
+                           admin_pic=admin_pic,
                            filter_dept=filter_dept, 
                            filter_cgpa=filter_cgpa,
                            search_query=search_query,

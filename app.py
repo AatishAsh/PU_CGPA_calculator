@@ -3,7 +3,7 @@
 # ==========================================
 
 import os
-from flask import Flask, session, redirect
+from flask import Flask, session, redirect, send_from_directory
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
 
@@ -26,6 +26,10 @@ init_db()
 app.register_blueprint(auth_bp)
 app.register_blueprint(student_bp)
 app.register_blueprint(admin_bp)
+
+@app.route('/img/<path:filename>')
+def serve_img(filename):
+    return send_from_directory('img', filename)
 
 if __name__ == "__main__":
     debug_mode = os.environ.get("FLASK_DEBUG", "True").lower() == "true"
