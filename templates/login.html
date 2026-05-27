@@ -120,20 +120,42 @@
         loginForm.reset();
     }
 
-    function toggleForms() {
+    function toggleForms(force) {
         const regSec = document.getElementById('registerSection');
         const loginSec = document.getElementById('loginSection');
         
-        if (regSec.style.display === 'none') {
-            regSec.style.display = 'block';
-            loginSec.style.display = 'none';
-            clearLoginForm();
-        } else {
+        // If force is provided, use it, otherwise toggle
+        let showLogin = force === 'login';
+        if (force === undefined) {
+            showLogin = regSec.style.display !== 'none';
+        }
+
+        if (showLogin) {
             regSec.style.display = 'none';
             loginSec.style.display = 'block';
+            window.location.hash = 'login';
             clearRegisterForm();
+        } else {
+            regSec.style.display = 'block';
+            loginSec.style.display = 'none';
+            window.location.hash = 'register';
+            clearLoginForm();
         }
     }
+
+    // Set hash to login after successful registration submit
+    registerForm.addEventListener('submit', function() {
+        if (this.checkValidity()) {
+            window.location.hash = 'login';
+        }
+    });
+
+    // Set hash to login when login fails and page reloads
+    loginForm.addEventListener('submit', function() {
+        if (this.checkValidity()) {
+            window.location.hash = 'login';
+        }
+    });
 
     const registerPasswordInput = document.getElementById('registerPassword');
     const registerConfirmPasswordInput = document.getElementById('registerConfirmPassword');
@@ -175,8 +197,12 @@
     registerConfirmPasswordInput.addEventListener('input', validatePasswords);
 
     window.addEventListener('load', function () {
-        clearRegisterForm();
-        clearLoginForm();
+        // Handle initial view based on URL hash
+        if (window.location.hash === '#register') {
+            toggleForms('register');
+        } else {
+            toggleForms('login');
+        }
     });
 </script>
 {% endblock %}

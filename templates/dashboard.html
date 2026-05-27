@@ -18,6 +18,7 @@
     <div class="d-grid gap-3">
         <a href="/dashboard" class="neo-btn neo-btn-primary text-center">Home</a>
         <a href="/profile" class="neo-btn neo-btn-secondary text-center">Edit Profile</a>
+        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" class="neo-btn text-center" style="background-color: #ff9ff3;">Surprise!</a>
         <a href="/logout" class="neo-btn neo-btn-danger text-center">Logout</a>
     </div>
 {% endblock %}
@@ -36,13 +37,13 @@
     {% endif %}
 
     <div class="row">
-        <div class="col-lg-5">
+        <div class="col-lg-{% if selected_sem %}5{% else %}12{% endif %} mb-4">
             <!-- SELECT SEM -->
-            <div class="neo-card neo-card-utility">
-                <h4 class="mb-3">Select Semester</h4>
+            <div class="neo-card neo-card-utility {% if not selected_sem %}mx-auto{% endif %}" style="{% if not selected_sem %}max-width: 600px;{% endif %}">
+                <h4 class="mb-3">Select Semester to Edit</h4>
                 <form method="GET">
-                    <select name="semester" class="form-select mb-3" onchange="this.form.submit()">
-                        <option value="">-- CHOOSE --</option>
+                    <select name="semester" class="form-select mb-0" onchange="this.form.submit()">
+                        <option value="">-- CHOOSE SEMESTER --</option>
                         {% for sem in syllabus %}
                         <option value="{{sem}}" {% if selected_sem == sem %}selected{% endif %}>
                             SEMESTER {{sem}}
@@ -54,7 +55,7 @@
 
             <!-- SUBJECTS ENTRY -->
             {% if selected_sem %}
-            <div class="neo-card neo-card-hero">
+            <div class="neo-card neo-card-hero mt-4">
                 <h4 class="mb-4">Enter Grades: Sem {{selected_sem}}</h4>
                 <form method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -79,13 +80,16 @@
                     </div>
                     {% endfor %}
                     
-                    <button type="submit" class="neo-btn neo-btn-primary w-100 mt-2">Update Grades</button>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="neo-btn neo-btn-primary flex-grow-1">Update Grades</button>
+                        <a href="/dashboard" class="neo-btn neo-btn-danger text-center px-3">Cancel</a>
+                    </div>
                 </form>
             </div>
             {% endif %}
         </div>
 
-        <div class="col-lg-7">
+        <div class="col-lg-{% if selected_sem %}7{% else %}12{% endif %}">
             <!-- PROGRESS CHART -->
             {% if gradesData %}
             <div class="neo-card neo-card-utility mb-5">
@@ -99,36 +103,40 @@
             <h4 class="mb-4 neo-heading">Academic History</h4>
             <!-- SAVED SEMESTERS TABLES -->
             {% if gradesData %}
+                <div class="row">
                 {% for sem, data in gradesData.items() | sort %}
-                <div class="neo-card neo-card-data mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="mb-0">Semester {{sem}}</h4>
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="neo-border bg-white px-3 py-1 fw-bold">SGPA: {{data.sgpa}}</div>
-                            <form action="/dashboard/clear/{{sem}}" method="POST" onsubmit="return confirm('ARE YOU SURE YOU WANT TO CLEAR ALL GRADES FOR SEMESTER {{sem}}?');" class="m-0">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <button type="submit" class="neo-btn neo-btn-danger d-flex align-items-center justify-content-center fw-bold small" title="Clear Semester" style="box-shadow: none !important; width: 35px; height: 35px; padding: 0;">X</button>
-                            </form>
+                <div class="{% if selected_sem %}col-12{% else %}col-lg-6{% endif %}">
+                    <div class="neo-card neo-card-data mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="mb-0">Semester {{sem}}</h4>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="neo-border bg-white px-3 py-1 fw-bold">SGPA: {{data.sgpa}}</div>
+                                <form action="/dashboard/clear/{{sem}}" method="POST" onsubmit="return confirm('ARE YOU SURE YOU WANT TO CLEAR ALL GRADES FOR SEMESTER {{sem}}?');" class="m-0">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="neo-btn neo-btn-danger d-flex align-items-center justify-content-center fw-bold small" title="Clear Semester" style="box-shadow: none !important; width: 35px; height: 35px; padding: 0;">X</button>
+                                </form>
+                            </div>
                         </div>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-bordered border-dark fw-bold small text-uppercase mb-0 neo-table-compact">
-                            <thead class="bg-white">
-                                <tr><th>Subject</th><th>Grade</th><th class="hide-mobile">Cr</th></tr>
-                            </thead>
-                            <tbody>
-                                {% for s in data.subjects %}
-                                <tr>
-                                    <td>{{s.subject}}</td>
-                                    <td class="text-center">{{s.grade}}</td>
-                                    <td class="text-center hide-mobile">{{s.credit}}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="table table-bordered border-dark fw-bold small text-uppercase mb-0 neo-table-compact">
+                                <thead class="bg-white">
+                                    <tr><th>Subject</th><th>Grade</th><th class="hide-mobile">Cr</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for s in data.subjects %}
+                                    <tr>
+                                        <td>{{s.subject}}</td>
+                                        <td class="text-center">{{s.grade}}</td>
+                                        <td class="text-center hide-mobile">{{s.credit}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
                 {% endfor %}
+                </div>
             {% else %}
                 <div class="neo-card neo-card-utility text-center">
                     <p class="mb-0 fw-bold">No academic records found. Start by entering grades for a semester.</p>
