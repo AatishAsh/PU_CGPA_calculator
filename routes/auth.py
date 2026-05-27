@@ -80,13 +80,13 @@ def profile():
     conn = get_db_connection()
     
     if request.method == "POST":
-        new_username = request.form.get("username").strip()
+        new_username = request.form.get("username", "").strip()
         new_dept = request.form.get("department")
         new_password = request.form.get("password")
         new_profile_pic = request.form.get("profile_pic", "default.png")
         
-        if not new_username:
-            flash("Name cannot be empty.", "danger")
+        if not new_username and not new_profile_pic:
+            flash("No changes provided.", "danger")
             return redirect("/profile")
             
         try:
@@ -94,8 +94,8 @@ def profile():
                 # Update profile picture
                 conn.execute("UPDATE users SET profile_pic = ? WHERE username = ?", (new_profile_pic, current_username))
 
-                # Handle username change
-                if new_username != current_username:
+                # Handle username change (only if provided and different)
+                if new_username and new_username != current_username:
                     existing = conn.execute("SELECT * FROM users WHERE username = ?", (new_username,)).fetchone()
                     if existing:
                         flash("This name is already taken.", "danger")
@@ -107,9 +107,10 @@ def profile():
                     session["user"] = new_username
                     current_username = new_username
                 
-                # Update department
-                conn.execute("UPDATE users SET department = ? WHERE username = ?", (new_dept, current_username))
-                session["department"] = new_dept
+                # Update department (ONLY if provided - handles disabled fields)
+                if new_dept:
+                    conn.execute("UPDATE users SET department = ? WHERE username = ?", (new_dept, current_username))
+                    session["department"] = new_dept
                 
                 # Update password if provided
                 if new_password:
